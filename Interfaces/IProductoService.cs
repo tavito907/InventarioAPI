@@ -1,5 +1,5 @@
 ﻿using InventarioAPI.Models;
-using InventarioAPI.DTOs;
+using InventarioAPI.DTOs.Productos;
 
 namespace InventarioAPI.Interfaces
 {
@@ -9,7 +9,7 @@ namespace InventarioAPI.Interfaces
 
         Task<ProductoDto?> ObtenerPorIdAsync(int id);
 
-        Task<Producto> CrearAsync(CrearProductoDto dto);
+        Task<ProductoDto> CrearAsync(CrearProductoDto dto);
 
         Task<bool> ActualizarAsync(int id, ActualizarProductoDto dto);
 

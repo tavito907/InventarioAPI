@@ -1,5 +1,5 @@
 ﻿using InventarioAPI.Data;
-using InventarioAPI.DTOs;
+using InventarioAPI.DTOs.Productos;
 using InventarioAPI.Interfaces;
 using InventarioAPI.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -26,6 +26,7 @@ namespace InventarioAPI.Services
                     Nombre = p.Nombre,
                     Precio = p.Precio,
                     Stock = p.Stock,
+                    Categoria = p.Categoria.Nombre,
                 })
                 .ToListAsync();
         }
@@ -40,39 +41,65 @@ namespace InventarioAPI.Services
                     Id = p.Id,
                     Nombre = p.Nombre,
                     Precio = p.Precio,
-                    Stock = p.Stock
+                    Stock = p.Stock,
+                    Categoria = p.Categoria.Nombre
+
                 })
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<Producto> CrearAsync(CrearProductoDto dto)
+        public async Task<ProductoDto> CrearAsync(CrearProductoDto dto)
         {
+            var categoria = await _context.Categorias.FindAsync(dto.CategoriaId);
+
+            if(categoria is null)
+            {
+                throw new Exception("La categoría no existe");
+            }
+
             var producto = new Producto
             {
                 Nombre = dto.Nombre,
                 Precio = dto.Precio,
                 Stock = dto.Stock,
+                CategoriaId = categoria.Id
             };
 
             await _context.Productos.AddAsync(producto);
 
             await _context.SaveChangesAsync();
 
-            return producto;
+            return new ProductoDto
+            {
+                Id = producto.Id,
+                Nombre = producto.Nombre,
+                Precio = producto.Precio,
+                Stock = producto.Stock,
+                Categoria = categoria.Nombre
+            };
+
         }
 
         public async Task<bool> ActualizarAsync(int id, ActualizarProductoDto dto)
         {
             var producto = await _context.Productos.FindAsync(id);
 
-            if(producto is null)
+            var categoria = await _context.Categorias.FindAsync(dto.CategoriaId);
+
+            if (producto is null)
             {
-                return false;
+                throw new Exception("Producto no encontrado");
+            }
+
+            if(categoria is null)
+            {
+                throw new Exception("La categoría no existe");
             }
 
             producto.Nombre = dto.Nombre;
             producto.Precio = dto.Precio;
             producto.Stock = dto.Stock;
+            producto.CategoriaId = dto.CategoriaId;
 
             await _context.SaveChangesAsync();
 

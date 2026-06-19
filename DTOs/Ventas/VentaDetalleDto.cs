@@ -1,4 +1,4 @@
-﻿namespace InventarioAPI.DTOs
+﻿namespace InventarioAPI.DTOs.Ventas
 {
     public class VentaDetalleDto
     {

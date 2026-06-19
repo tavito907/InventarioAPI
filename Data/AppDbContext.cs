@@ -14,5 +14,6 @@ namespace InventarioAPI.Data
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Venta> Ventas { get; set; }
         public DbSet<DetalleVenta> DetallesVenta { get; set; }
+        public DbSet<Categoria> Categorias { get; set; } 
     }
 }

@@ -98,7 +98,6 @@ C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\Inven
 C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\staticwebassets.build.json.cache
 C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\staticwebassets.build.endpoints.json
-C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\Inventar.63A8EA75.Up2Date
 C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\InventarioAPI.dll
 C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\refint\InventarioAPI.dll
@@ -106,3 +105,4 @@ C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\Inven
 C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\InventarioAPI.genruntimeconfig.cache
 C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\ref\InventarioAPI.dll
 C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\InventarioAPI.sourcelink.json
+C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

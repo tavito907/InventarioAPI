@@ -1,8 +1,8 @@
 ﻿using InventarioAPI.Data;
-using InventarioAPI.DTOs;
 using InventarioAPI.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using InventarioAPI.Models;
+using InventarioAPI.DTOs.Ventas;
 
 namespace InventarioAPI.Services
 {

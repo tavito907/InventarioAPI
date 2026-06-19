@@ -1,10 +1,10 @@
 ﻿using InventarioAPI.Data;
-using InventarioAPI.DTOs;
 using InventarioAPI.Models;
 using InventarioAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using InventarioAPI.Interfaces;
+using InventarioAPI.DTOs.Productos;
 
 namespace InventarioAPI.Controllers
 {

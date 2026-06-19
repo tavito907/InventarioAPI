@@ -1,5 +1,5 @@
 ﻿using InventarioAPI.Models;
-using InventarioAPI.DTOs;
+using InventarioAPI.DTOs.Ventas;
 
 namespace InventarioAPI.Interfaces
 {

@@ -24,6 +24,7 @@ namespace InventarioAPI
 
             builder.Services.AddScoped<IProductoService, ProductoService>();
             builder.Services.AddScoped<IVentaService, VentaService>();
+            builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 
             var app = builder.Build();
 
