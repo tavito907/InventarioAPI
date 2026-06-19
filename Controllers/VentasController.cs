@@ -1,5 +1,6 @@
 ﻿using InventarioAPI.Data;
 using InventarioAPI.DTOs;
+using InventarioAPI.Interfaces;
 using InventarioAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,54 +11,31 @@ namespace InventarioAPI.Controllers
     [Route("api/[controller]")]
     public class VentasController : ControllerBase 
     {
-        private readonly AppDbContext _context;
+        private readonly IVentaService _ventaService;
 
-        public VentasController(AppDbContext context)
+        public VentasController(IVentaService ventaService)
         {
-            _context = context;
+            _ventaService = ventaService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> CrearVenta()
+        public async Task<IActionResult> CrearVenta(CrearVentaDto dto)
         {
-            var venta = new Venta
+            try
             {
-                Fecha = DateTime.UtcNow,
-                Total = 850
-            };
-
-            venta.DetallesVenta.Add(
-                new DetalleVenta
-                {
-                    ProductoId = 1,
-                    Cantidad = 2,
-                    PrecioUnitario = 350
-                });
-
-            venta.DetallesVenta.Add(
-                new DetalleVenta
-                {
-                    ProductoId = 3,
-                    Cantidad = 1,
-                    PrecioUnitario = 150
-                });
-
-            await _context.Ventas.AddAsync(venta);
-
-            await _context.SaveChangesAsync();
-
-            return Ok(venta);
+                var venta = await _ventaService.CrearAsync(dto);
+                return Ok(venta);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> ObtenerVentas()
         {
-            var ventas = await _context.Ventas.AsNoTracking().Select(v => new VentaDto
-            {
-                Id = v.Id,
-                Fecha = v.Fecha,
-                Total = v.Total,
-            }).ToListAsync();
+            var ventas = await _ventaService.ObtenerTodasAsync();
 
             return Ok(ventas);
         }
@@ -65,22 +43,9 @@ namespace InventarioAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> ObtenerVenta(int id)
         {
-            var venta = await _context.Ventas.AsNoTracking().Where(v => v.Id == id).Select(v => new VentaDetalleDto
-            {
-                Id = v.Id,
-                Fecha = v.Fecha,
-                Total = v.Total,
+            var venta = await _ventaService.ObtenerPorIdAsync(id);
 
-                Detalles = v.DetallesVenta.Select(d => new DetalleVentaDto
-                {
-                    NombreProducto = d.Producto.Nombre,
-                    Cantidad = d.Cantidad,
-                    PrecioUnitario = d.PrecioUnitario
-                }).ToList()
-
-            }).FirstOrDefaultAsync();
-
-            if (venta is null)
+            if(venta is null)
             {
                 return NotFound();
             }

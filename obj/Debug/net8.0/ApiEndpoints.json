@@ -85,7 +85,13 @@
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "InventarioAPI.DTOs.CrearVentaDto",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {

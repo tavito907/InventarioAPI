@@ -135,6 +135,25 @@
         "tags": [
           "Ventas"
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrearVentaDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrearVentaDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrearVentaDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -196,6 +215,20 @@
         },
         "additionalProperties": false
       },
+      "CrearDetalleVentaDto": {
+        "type": "object",
+        "properties": {
+          "productoId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "CrearProductoDto": {
         "type": "object",
         "properties": {
@@ -210,6 +243,19 @@
           "stock": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CrearVentaDto": {
+        "type": "object",
+        "properties": {
+          "detalles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CrearDetalleVentaDto"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false

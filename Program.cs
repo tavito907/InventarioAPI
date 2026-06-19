@@ -23,6 +23,7 @@ namespace InventarioAPI
                     builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddScoped<IProductoService, ProductoService>();
+            builder.Services.AddScoped<IVentaService, VentaService>();
 
             var app = builder.Build();
 

@@ -105,3 +105,4 @@ C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\Inven
 C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\InventarioAPI.pdb
 C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\InventarioAPI.genruntimeconfig.cache
 C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\ref\InventarioAPI.dll
+C:\Users\sando\OneDrive\Escritorio\Yo\MetaDevGustavo\Backend\InventarioAPI\InventarioAPI\obj\Debug\net8.0\InventarioAPI.sourcelink.json
