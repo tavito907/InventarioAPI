@@ -1,18 +1,19 @@
 ﻿using InventarioAPI.Models;
 using InventarioAPI.DTOs.Productos;
+using InventarioAPI.DTOs.Compartidos;
 
 namespace InventarioAPI.Interfaces
 {
     public interface IProductoService
     {
-        Task<List<ProductoDto>> ObtenerTodosAsync();
+        Task<PaginacionDto<ProductoDto>> ObtenerTodosAsync(BuscarProductoDto filtros);
 
-        Task<ProductoDto?> ObtenerPorIdAsync(int id);
+        Task<ProductoDto> ObtenerPorIdAsync(int id);
 
         Task<ProductoDto> CrearAsync(CrearProductoDto dto);
 
-        Task<bool> ActualizarAsync(int id, ActualizarProductoDto dto);
+        Task ActualizarAsync(int id, ActualizarProductoDto dto);
 
-        Task<bool> EliminarAsync(int id);
+        Task EliminarAsync(int id);
     }
 }

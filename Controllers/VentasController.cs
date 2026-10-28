@@ -1,7 +1,8 @@
-﻿using InventarioAPI.Data;
+using InventarioAPI.Data;
 using InventarioAPI.DTOs.Ventas;
 using InventarioAPI.Interfaces;
 using InventarioAPI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,7 @@ namespace InventarioAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class VentasController : ControllerBase 
+    public class VentasController : BaseApiController
     {
         private readonly IVentaService _ventaService;
 
@@ -21,15 +22,10 @@ namespace InventarioAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CrearVenta(CrearVentaDto dto)
         {
-            try
-            {
-                var venta = await _ventaService.CrearAsync(dto);
-                return Ok(venta);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
+             var venta = await _ventaService.CrearAsync(dto);
+
+             return Ok(venta);
         }
 
         [HttpGet]
@@ -41,7 +37,7 @@ namespace InventarioAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> ObtenerVenta(int id)
+        public async Task<IActionResult> ObtenerVentaId(int id)
         {
             var venta = await _ventaService.ObtenerPorIdAsync(id);
 

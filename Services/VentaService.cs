@@ -1,18 +1,25 @@
-﻿using InventarioAPI.Data;
+using InventarioAPI.Data;
 using InventarioAPI.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using InventarioAPI.Models;
 using InventarioAPI.DTOs.Ventas;
+using InventarioAPI.Exceptions;
+using System.Collections.Immutable;
+using Microsoft.VisualBasic;
+using InventarioAPI.Repositories;
+using Microsoft.EntityFrameworkCore.Storage.Json;
 
 namespace InventarioAPI.Services
 {
     public class VentaService : IVentaService
     {
         private readonly AppDbContext _context;
+        private readonly IProductoRepository _productoRepository;
 
-        public VentaService(AppDbContext context)
+        public VentaService(AppDbContext context, IProductoRepository productoRepository)
         {
             _context = context;
+            _productoRepository = productoRepository;
         }
 
         public async Task<List<VentaDto>> ObtenerTodasAsync()
@@ -44,47 +51,105 @@ namespace InventarioAPI.Services
 
         public async Task<Venta> CrearAsync(CrearVentaDto dto)
         {
-            var venta = new Venta
+            using var transaction =
+                await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                Fecha = DateTime.UtcNow
-            };
-
-            decimal total = 0;
-            foreach (var detalledDto in dto.Detalles)
-            {
-                var producto = await _context.Productos.FindAsync(detalledDto.ProductoId);
-
-                if(producto is null)
+                var venta = new Venta
                 {
-                    throw new Exception("Producto no encontrado");
-                }
-
-                if (producto.Stock < detalledDto.Cantidad)
-                {
-                    throw new Exception(
-                        $"Stock insuficiente para el producto {producto.Nombre}");
-                }
-
-                var detalleVenta = new DetalleVenta
-                {
-                    ProductoId = producto.Id,
-                    Cantidad = detalledDto.Cantidad,
-                    PrecioUnitario = producto.Precio
+                    Fecha = DateTime.UtcNow
                 };
 
-                producto.Stock -= detalledDto.Cantidad;
+                var productosIds = dto.Detalles
+                    .Select(p => p.ProductoId)
+                    .Distinct()
+                    .ToList();
 
-                venta.DetallesVenta.Add(detalleVenta);
+                var productos = await _productoRepository
+                    .ObtenerPorIdsAsync(productosIds);
 
-                total += producto.Precio * detalledDto.Cantidad;
+                ValidarProductos(dto.Detalles, productos);
+
+                venta.DetallesVenta = CrearDetalles(
+                    dto.Detalles,
+                    productos,
+                    out decimal total);
+
+                venta.Total = total;
+
+                await _context.Ventas.AddAsync(venta);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return venta;
+            }
+            catch(DbUpdateConcurrencyException)
+            {
+                await transaction.RollbackAsync();
+
+                throw new ConflictException(
+                    "Uno de los productos fue modificado por otro proceso. Intenta nuevamente.");
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+        private void ValidarProductos(List<CrearDetalleVentaDto> detalles, List<Producto> productos)
+        {
+            var idsFaltantes = detalles.Select(d => d.ProductoId)
+                .Distinct()
+                .Except(productos.Select(p => p.Id))
+                .ToList();
+
+            if(idsFaltantes.Any())
+            {
+                throw new NotFoundException($"Los siguientes productos no existen: {string.Join(",", idsFaltantes)}");
             }
 
-            venta.Total = total;
+            foreach (var detalleDto in detalles)
+            {
+                var producto = productos.First(p => p.Id == detalleDto.ProductoId);
 
-            await _context.Ventas.AddAsync(venta);
-            await _context.SaveChangesAsync();
+                if (producto.Stock < detalleDto.Cantidad)
+                {
+                    throw new BadRequestException($"Stock insuficiente para el producto {producto.Nombre}");
+                }
+            }
+        }
 
-            return venta;
+        private List<DetalleVenta> CrearDetalles(List<CrearDetalleVentaDto> detallesDto,
+            List<Producto> productos,
+            out decimal total)
+        {
+            total = 0;
+
+            var detalles = new List<DetalleVenta>();
+
+            foreach(var detalleDto in detallesDto)
+            {
+                var producto = productos.First(p => p.Id == detalleDto.ProductoId);
+
+                var detalle = new DetalleVenta
+                {
+                    ProductoId = producto.Id,
+                    Cantidad = detalleDto.Cantidad,
+                    PrecioUnitario = producto.Precio,
+                };
+
+                producto.Stock -= detalleDto.Cantidad;
+                producto.Version++;
+
+                detalles.Add(detalle);
+
+                total += producto.Precio * detalleDto.Cantidad;
+            }
+
+            return detalles;
         }
     }
 }

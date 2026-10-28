@@ -9,6 +9,8 @@ namespace InventarioAPI.Models
         public decimal Precio { get; set; }
         public int Stock { get; set; }
 
+        public int Version { get; set; }
+
         [JsonIgnore]
         public ICollection<DetalleVenta> DetallesVenta { get; set; }
             = new List<DetalleVenta>();

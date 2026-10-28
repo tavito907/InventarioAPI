@@ -1,73 +1,68 @@
-﻿using InventarioAPI.Data;
+﻿using AutoMapper;
+using InventarioAPI.Data;
+using InventarioAPI.DTOs.Compartidos;
 using InventarioAPI.DTOs.Productos;
+using InventarioAPI.Enums;
+using InventarioAPI.Exceptions;
 using InventarioAPI.Interfaces;
 using InventarioAPI.Models;
+using InventarioAPI.Repositories;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 namespace InventarioAPI.Services
 {
     public class ProductoService : IProductoService
     {
-        private readonly AppDbContext _context;
+        private readonly IProductoRepository _productoRepository;
 
-        public ProductoService(AppDbContext context)
+        private readonly ILogger<ProductoService> _logger;
+
+        private readonly IMapper _mapper;
+
+        public ProductoService(IProductoRepository productoRepository, ILogger<ProductoService> logger, IMapper mapper)
         {
-            _context = context;
+            _productoRepository = productoRepository;
+            _logger = logger;
+            _mapper = mapper;
         }
 
-        public async Task<List<ProductoDto>> ObtenerTodosAsync()
+        public async Task<PaginacionDto<ProductoDto>> ObtenerTodosAsync(BuscarProductoDto filtros)
         {
-            return await _context.Productos
-                .AsNoTracking()
-                .Select(p => new ProductoDto
-                {
-                    Id = p.Id,
-                    Nombre = p.Nombre,
-                    Precio = p.Precio,
-                    Stock = p.Stock,
-                    Categoria = p.Categoria.Nombre,
-                })
-                .ToListAsync();
+
+            _logger.LogInformation("Buscando productos. Nombre: {Nombre}, Categoria: {CategoriaId}",
+                filtros.Nombre,
+                filtros.CategoriaId);
+
+            return await _productoRepository.ObtenerTodosAsync(filtros);
+
         }
-
-        public async Task<ProductoDto?> ObtenerPorIdAsync(int id)
+        public async Task<ProductoDto> ObtenerPorIdAsync(int id)
         {
-            return await _context.Productos
-                .AsNoTracking()
-                .Where(p => p.Id == id)
-                .Select(p => new ProductoDto
-                {
-                    Id = p.Id,
-                    Nombre = p.Nombre,
-                    Precio = p.Precio,
-                    Stock = p.Stock,
-                    Categoria = p.Categoria.Nombre
+            var producto = await _productoRepository.ObtenerPorIdAsync(id);
 
-                })
-                .FirstOrDefaultAsync();
+            if(producto is null)
+            {
+                throw new NotFoundException("El producto no existe");
+            }
+
+            return producto;
         }
 
         public async Task<ProductoDto> CrearAsync(CrearProductoDto dto)
         {
-            var categoria = await _context.Categorias.FindAsync(dto.CategoriaId);
+           var categoria = await _productoRepository.ObtenerCategoriaAsync(dto.CategoriaId);
 
             if(categoria is null)
             {
-                throw new Exception("La categoría no existe");
+                throw new NotFoundException("La categoria no existe.");
             }
 
-            var producto = new Producto
-            {
-                Nombre = dto.Nombre,
-                Precio = dto.Precio,
-                Stock = dto.Stock,
-                CategoriaId = categoria.Id
-            };
+            var producto = _mapper.Map<Producto>(dto);
 
-            await _context.Productos.AddAsync(producto);
-
-            await _context.SaveChangesAsync();
+            await _productoRepository.AgregarAsync(producto);
+            await _productoRepository.GuardarCambiosAsync();
 
             return new ProductoDto
             {
@@ -75,25 +70,25 @@ namespace InventarioAPI.Services
                 Nombre = producto.Nombre,
                 Precio = producto.Precio,
                 Stock = producto.Stock,
-                Categoria = categoria.Nombre
+                Categoria = categoria.Nombre,
             };
 
         }
 
-        public async Task<bool> ActualizarAsync(int id, ActualizarProductoDto dto)
+        public async Task ActualizarAsync(int id, ActualizarProductoDto dto)
         {
-            var producto = await _context.Productos.FindAsync(id);
-
-            var categoria = await _context.Categorias.FindAsync(dto.CategoriaId);
+            var producto = await _productoRepository.ObtenerEntidadPorIdAsync(id);
 
             if (producto is null)
             {
-                throw new Exception("Producto no encontrado");
+                throw new NotFoundException("Producto no encontrado");
             }
+
+            var categoria = await _productoRepository.ObtenerCategoriaAsync(dto.CategoriaId);
 
             if(categoria is null)
             {
-                throw new Exception("La categoría no existe");
+                throw new NotFoundException("La categoria no existe.");
             }
 
             producto.Nombre = dto.Nombre;
@@ -101,25 +96,22 @@ namespace InventarioAPI.Services
             producto.Stock = dto.Stock;
             producto.CategoriaId = dto.CategoriaId;
 
-            await _context.SaveChangesAsync();
-
-            return true;
+            await _productoRepository.ActualizarAsync(producto);
+            await _productoRepository.GuardarCambiosAsync();
         }
 
-        public async Task<bool> EliminarAsync(int id)
+        public async Task EliminarAsync(int id)
         {
-            var producto = await _context.Productos.FindAsync(id);
+            var producto = await _productoRepository.ObtenerEntidadPorIdAsync(id);
 
             if (producto is null)
             {
-                return false;
+                throw new NotFoundException("El producto no existe.");
             }
 
-            _context.Productos.Remove(producto);
+            await _productoRepository.EliminarAsync(producto);
 
-            await _context.SaveChangesAsync();
-
-            return true;
+            await _productoRepository.GuardarCambiosAsync();
         }
     }
 }
